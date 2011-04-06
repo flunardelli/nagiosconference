@@ -57,13 +57,14 @@
                     for (var i in dataj[j].metrics.data) {
                         var format = (dataj[j].metrics.data[i].unit) ? "#.###"+dataj[j].metrics.data[i].unit : "#.###";
                         var min = (dataj[j].metrics.data[i].min) ? parseFloat(dataj[j].metrics.data[i].min) : "0";
+                        var max = (dataj[j].metrics.data[i].max) ? parseFloat(dataj[j].metrics.data[i].max) : "automatic";
                         if (dcolumn)
                             metadata[j]['data'].addColumn('number', i);
                         dm.push(parseFloat(dataj[j].metrics.data[i].value));
                     }                    
                     dcolumn = false;                    
                     metadata[j]['data'].addRow(dm);
-                    metadata[j]['chart'].draw(metadata[j]['data'], {vAxis: {format: format, minValue: min}, title: dataj[j].host_alias +" - "+dataj[j].service_description });                   
+                    metadata[j]['chart'].draw(metadata[j]['data'], {vAxis: {format: format, minValue: min, maxValue: max}, title: dataj[j].host_alias +" - "+dataj[j].service_description });                   
                 }                                   
             });               
             },3000);   
