@@ -1,0 +1,84 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      Nagios Conference - Google Visualization API Sample
+    </title>
+    <script type="text/javascript" src="http://www.google.com/jsapi"></script>
+    <script type="text/javascript">
+        google.load("jquery", "1");
+        google.load('visualization', '1', {packages: ['corechart','table']});
+    </script>
+    <script type="text/javascript">
+  
+    function drawVisualization() {
+        metadata = {};
+        //visualization = new google.visualization.Table(document.getElementById('visualization'));                                    
+        $('#target').submit(function() {
+            var url = "http://"+$("input:first").val()+"/ana/?action=getStatus&callback=?";
+            plot(url);
+            return false;
+        });
+    }
+ 
+    function plot(url) {
+        console.log(url);
+        function ISODateString(d){
+            function pad(n){return n<10 ? '0'+n : n}
+            return pad(d.getUTCHours())+':'+ pad(d.getUTCMinutes())+':'+ pad(d.getUTCSeconds());
+        };
+        setInterval(function(){
+            $.getJSON(url, 'jsonData={"metricId":["all","all","all","all"],"realTimeOids":[],"objectType":"1","extendedStatusOids":[],"objectId":["localhost!Swap Usage","localhost!Root Partition","localhost!PING","localhost!Current Load"],"oids":["FA62A079-B4DA-B41B-E3DC-2B36DB1BF9AD","F5EF2808-E489-CFFA-0434-2B36C19EC2A2","F14C00B7-734B-D511-7364-2B36D1CAF3A8","BA03D221-F781-756B-908C-2B36C9CA63C4"],"details":false}', 
+            function (dataj) {
+                console.dir(dataj);
+                for (var j in dataj){ 
+
+                    if (!metadata[j])
+                        metadata[j] = {data: null,chart: null};
+
+                    if (!metadata[j]['data']){
+                        metadata[j]['data'] = new google.visualization.DataTable();
+                    }
+                    
+                    if (!metadata[j]['chart']) {
+                        $("#visualization").append("<div style='width: 600px; height: 400px; float: left' id='visualization" + j + "'>"+j+"</div>");
+                        metadata[j]['chart'] = new google.visualization.LineChart(document.getElementById('visualization'+ j));
+                        metadata[j]['chart'].draw(metadata[j]['data'], {curveType: "function", width: 500, height: 400, vAxis: {maxValue: 10}} );
+                    }
+
+                    var dcolumn = (!metadata[j]['data'].getNumberOfColumns()) ? true : false;
+                                        
+                    if (dcolumn) 
+                        metadata[j]['data'].addColumn('string', 'Time');             
+                    
+                    var dm = [ISODateString(new Date())];
+                    
+                    for (var i in dataj[j].metrics.data) {
+                        var format = (dataj[j].metrics.data[i].unit) ? "#.###"+dataj[j].metrics.data[i].unit : "#.###";
+                        var min = (dataj[j].metrics.data[i].min) ? parseFloat(dataj[j].metrics.data[i].min) : "0";
+                        var max = (dataj[j].metrics.data[i].max) ? parseFloat(dataj[j].metrics.data[i].max) : "automatic";
+                        if (dcolumn)
+                            metadata[j]['data'].addColumn('number', i);
+                        dm.push(parseFloat(dataj[j].metrics.data[i].value));
+                    }                    
+                    dcolumn = false;                    
+                    metadata[j]['data'].addRow(dm);
+                    metadata[j]['chart'].draw(metadata[j]['data'], {vAxis: {format: format, minValue: min, maxValue: max}, title: dataj[j].host_alias +" - "+dataj[j].service_description });                   
+                }                                   
+            });               
+            },3000);   
+    }
+      
+    google.setOnLoadCallback(drawVisualization);
+    </script>
+  </head>
+  <body style="font-family: Arial;border: 0 none;">
+    <form id="target">
+    	ANA Server
+        <input type="text" value="192.168.10.215" />
+        <input type="submit" value="Go plot!!" />
+    </form>
+    <div id="visualization" style="width: 100%; height: 100%;"></div>
+  </body>
+</html>​
