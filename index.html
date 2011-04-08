@@ -49,7 +49,7 @@
 
                     if (!metadata[j]['data']) {
                         metadata[j]['data'] = new google.visualization.DataTable();
-                        $("#visualization").append("<div style='width: 600px; height: 400px; float: left; margin-right: 10px' id='visualization" + j + "'>"+j+"</div>");
+                        $("#visualization").append("<div style='width: 420px; height: 300px; float: left; margin-right: 10px' id='visualization" + j + "'>"+j+"</div>");
                     }
                     if (!metadata[j]['chart'])
                         metadata[j]['chart'] = new google.visualization[type](document.getElementById('visualization'+ j));	 			
@@ -71,7 +71,7 @@
                     }                    
                     dcolumn = false;                                        
                     metadata[j]['data'].addRow(dm);
-                    metadata[j]['chart'].draw(metadata[j]['data'], {curveType: "function", width: 500, height: 350, vAxis: {minValue: min, maxValue: max, format: format}, title: dataj[j].host_alias +" - "+dataj[j].service_description }); 
+                    metadata[j]['chart'].draw(metadata[j]['data'], {curveType: "function", vAxis: {minValue: min, maxValue: max, format: format}, title: dataj[j].host_alias +" - "+dataj[j].service_description }); 
                 }
             });               
             },3000);   
