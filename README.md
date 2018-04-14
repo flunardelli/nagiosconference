@@ -1,2 +1,2 @@
-Just an example usning ANA (Advanced Nagios Adapter) and Google Visualization API.
+Just an example using ANA (Advanced Nagios Adapter) and Google Visualization API.
 
